@@ -1,11 +1,39 @@
 import React, {Component} from 'react';
 import {WebView} from 'react-native-webview';
 import AsyncStorage from '@react-native-community/async-storage';
-
-// const HOST = 'http://192.168.1.8:3000';
-const HOST = 'https://qc-live-conference-dev.quancheng-ec.com';
+import dlv from 'dlv';
 
 export default class WebContainer extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      url: `${dlv(props, 'route.params.host')}/${dlv(
+        props,
+        'route.params.page',
+        'index',
+      )}.html?_c=rn&_p=${JSON.stringify({
+        params: dlv(props, 'route.params.params'),
+      })}`,
+    };
+    const headerConfig = dlv(props, 'route.params.headerConfig');
+
+    if (headerConfig) {
+      const {title, bgColor, titleColor} = headerConfig;
+      const options = {title};
+      if (bgColor) {
+        Object.assign(options, {
+          headerStyle: {
+            backgroundColor: bgColor,
+          },
+          headerTintColor: '#fff',
+        });
+      }
+      if (titleColor) {
+        options.headerTintColor = titleColor;
+      }
+      props.navigation.setOptions(options);
+    }
+  }
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', this.onShow);
   }
@@ -44,22 +72,8 @@ export default class WebContainer extends Component {
     const payload = JSON.parse(event.nativeEvent.data);
     if (payload.type === 'navigate') {
       if (payload.action === 'push' || payload.action === 'replace') {
-        const {
-          params,
-          page,
-          headerConfig: {titleColor, bgColor, title},
-        } = payload.data;
         this.sleep = true;
-        this.props.navigation[payload.action]('WebContainer', {
-          url: `${HOST}/${page}.html?_c=rn&_p=${JSON.stringify({
-            params,
-          })}`,
-          title,
-          headerStyle: {
-            backgroundColor: bgColor || '#fff',
-          },
-          headerTintColor: titleColor || (bgColor ? '#fff' : '#333'),
-        });
+        this.props.navigation[payload.action]('h666Container', payload.data);
       } else if (payload.action === 'pop') {
         const {params} = payload.data;
         AsyncStorage.setItem(
@@ -73,7 +87,6 @@ export default class WebContainer extends Component {
         this.props.navigation.pop();
       } else if (payload.action === 'back') {
         const {params, steps} = payload.data;
-        console.log(params, steps);
         AsyncStorage.setItem(
           '__ON_POP_OR_BACK_PARAMS__',
           JSON.stringify({
@@ -92,17 +105,22 @@ export default class WebContainer extends Component {
           page,
           params,
         );
+      } else if (payload.action === 'setTitle') {
+        this.props.navigation.setOptions({
+          title: payload.data,
+        });
       }
     }
   };
 
   render() {
+    const {url} = this.state;
     return (
       <WebView
         ref={r => (this.webref = r)}
         originWhitelist={['*']}
         onMessage={this.onMessage}
-        source={{uri: this.props.route.params.url}}
+        source={{uri: url}}
       />
     );
   }

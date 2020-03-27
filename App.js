@@ -8,7 +8,8 @@ import {
 } from '@react-navigation/stack';
 
 // const HOST = 'http://192.168.1.8:3000';
-const HOST = 'https://qc-live-conference-dev.quancheng-ec.com';
+// const HOST = 'https://qc-live-conference-dev.quancheng-ec.com';
+const HOST = 'https://h666-demo.ruiyun2015.com';
 import WebContainer from './container';
 
 function HomeScreen({navigation, route}) {
@@ -36,19 +37,22 @@ function App() {
         screenOptions={{
           cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
         }}>
-        <Stack.Screen
+        {/* <Stack.Screen
           name="Home"
           component={HomeScreen}
           options={{title: '主页'}}
-        />
+        /> */}
         <Stack.Screen
-          name="WebContainer"
+          name="h666Container"
           component={WebContainer}
-          options={({route}) => ({
-            title: route.params.title || 'h666',
-            headerStyle: route.params.headerStyle,
-            headerTintColor: route.params.headerTintColor,
-          })}
+          initialParams={{
+            host: HOST,
+            page: 'index',
+            headerConfig: {
+              title: 'h666演示',
+              bgColor: '#f8584f',
+            },
+          }}
         />
       </Stack.Navigator>
     </NavigationContainer>
