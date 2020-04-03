@@ -6,10 +6,47 @@ import {
   createStackNavigator,
   CardStyleInterpolators,
 } from '@react-navigation/stack';
+import {Platform} from 'react-native';
+
+import axios from 'axios';
+import Task from './task';
 
 // const HOST = 'http://192.168.1.8:3000';
 // const HOST = 'https://qc-live-conference-dev.quancheng-ec.com';
 const HOST = 'https://h666-demo.ruiyun2015.com';
+const updateTask = new Task(HOST);
+
+// const tempPath = RNFS.DocumentDirectoryPath + '/test.txt';
+
+// RNFS.writeFile(tempPath, 'Lorem ipsum dolor sit amet', 'utf8')
+//   .then(success => {
+//     console.log('FILE WRITTEN!');
+//   })
+//   .catch(err => {
+//     console.log(err.message);
+//   });
+// console.log(tempPath, 22222);
+// RNFS.readDir(RNFS.DocumentDirectoryPath).then(result => {
+//   console.log(result.map(item => item.path), 33333);
+// });
+if (Platform.OS === 'ios') {
+  // axios
+  //   .get(HOST + '/app.json' + '?ts=' + Date.now())
+  //   .then(ret => {
+  //     console.log(ret.data.version, 77777);
+  //     Object.keys(ret.data.hash).forEach(page => {
+  //       updateTask.add({
+  //         page,
+  //         hash: ret.data.hash[page],
+  //       });
+  //     });
+  //     updateTask.run();
+  //   })
+  //   .catch(error => {
+  //     console.log(error, 44444);
+  //   });
+}
+
 import WebContainer from './container';
 
 function HomeScreen({navigation, route}) {

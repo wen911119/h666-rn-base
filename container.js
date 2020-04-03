@@ -2,18 +2,30 @@ import React, {Component} from 'react';
 import {WebView} from 'react-native-webview';
 import AsyncStorage from '@react-native-community/async-storage';
 import dlv from 'dlv';
+import RNFS from 'react-native-fs';
+import {Platform} from 'react-native';
+const commonDir = RNFS.DocumentDirectoryPath;
 
 export default class WebContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      url: `${dlv(props, 'route.params.host')}/${dlv(
-        props,
-        'route.params.page',
-        'index',
-      )}.html?_c=rn&_p=${JSON.stringify({
-        params: dlv(props, 'route.params.params'),
-      })}`,
+      url:
+        Platform.OS === 'ios'
+          ? `${dlv(props, 'route.params.host')}/${dlv(
+              props,
+              'route.params.page',
+              'index',
+            )}.html?_c=rn&_p=${JSON.stringify({
+              params: dlv(props, 'route.params.params'),
+            })}`
+          : `file://${commonDir}/${dlv(
+              props,
+              'route.params.page',
+              'index',
+            )}.html?_c=rn&_p=${JSON.stringify({
+              params: dlv(props, 'route.params.params'),
+            })}`,
     };
     const headerConfig = dlv(props, 'route.params.headerConfig');
 
@@ -36,6 +48,16 @@ export default class WebContainer extends Component {
   }
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', this.onShow);
+    // setTimeout(() => {
+    //   const temp = this.state.localUrl
+    //     .replace('file://', '')
+    //     .replace('?_c=rn&_p={}', '');
+    //   console.log(temp, this.state.localUrl);
+    //   RNFS.exists(temp)
+    //     .then(ok => console.log(ok, 2222222))
+    //     .catch(console.log);
+    //   this.setState({url: this.state.localUrl.replace('?_c=rn&_p={}', '')});
+    // }, 10000);
   }
 
   onShow = async () => {
@@ -121,6 +143,12 @@ export default class WebContainer extends Component {
         originWhitelist={['*']}
         onMessage={this.onMessage}
         source={{uri: url}}
+        allowingReadAccessToURL={`file://${commonDir}`}
+        // allowsBackForwardNavigationGestures
+        allowFileAccess
+        contentInsetAdjustmentBehavior="automatic"
+        allowsFullscreenVideo
+        allowUniversalAccessFromFileURLs
       />
     );
   }
