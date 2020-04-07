@@ -30,21 +30,20 @@ const updateTask = new Task(HOST);
 //   console.log(result.map(item => item.path), 33333);
 // });
 if (Platform.OS === 'ios') {
-  // axios
-  //   .get(HOST + '/app.json' + '?ts=' + Date.now())
-  //   .then(ret => {
-  //     console.log(ret.data.version, 77777);
-  //     Object.keys(ret.data.hash).forEach(page => {
-  //       updateTask.add({
-  //         page,
-  //         hash: ret.data.hash[page],
-  //       });
-  //     });
-  //     updateTask.run();
-  //   })
-  //   .catch(error => {
-  //     console.log(error, 44444);
-  //   });
+  axios
+    .get(HOST + '/app.json' + '?ts=' + Date.now())
+    .then(ret => {
+      Object.keys(ret.data.hash).forEach(page => {
+        updateTask.add({
+          page,
+          hash: ret.data.hash[page],
+        });
+      });
+      updateTask.run();
+    })
+    .catch(error => {
+      console.log(error, 44444);
+    });
 }
 
 import WebContainer from './container';

@@ -11,7 +11,7 @@ export default class WebContainer extends Component {
     super(props);
     this.state = {
       url:
-        Platform.OS === 'ios'
+        Platform.OS === 'android'
           ? `${dlv(props, 'route.params.host')}/${dlv(
               props,
               'route.params.page',
@@ -144,7 +144,6 @@ export default class WebContainer extends Component {
         onMessage={this.onMessage}
         source={{uri: url}}
         allowingReadAccessToURL={`file://${commonDir}`}
-        // allowsBackForwardNavigationGestures
         allowFileAccess
         contentInsetAdjustmentBehavior="automatic"
         allowsFullscreenVideo
