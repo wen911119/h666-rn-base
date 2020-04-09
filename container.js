@@ -1,17 +1,19 @@
-import React, {Component} from 'react';
+import React, {Component, Fragment} from 'react';
 import {WebView} from 'react-native-webview';
 import AsyncStorage from '@react-native-community/async-storage';
 import dlv from 'dlv';
 import RNFS from 'react-native-fs';
 import {Platform} from 'react-native';
+import WebHolder from './webHolder';
 const commonDir = RNFS.DocumentDirectoryPath;
 
 export default class WebContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      webLoaded: false,
       url:
-        Platform.OS === 'android'
+        Platform.OS !== 'ios1'
           ? `${dlv(props, 'route.params.host')}/${dlv(
               props,
               'route.params.page',
@@ -135,20 +137,31 @@ export default class WebContainer extends Component {
     }
   };
 
+  onWebLoad = () => {
+    this.setState({
+      webLoaded: true,
+    });
+  };
+
   render() {
-    const {url} = this.state;
+    const {url, webLoaded} = this.state;
     return (
-      <WebView
-        ref={r => (this.webref = r)}
-        originWhitelist={['*']}
-        onMessage={this.onMessage}
-        source={{uri: url}}
-        allowingReadAccessToURL={`file://${commonDir}`}
-        allowFileAccess
-        contentInsetAdjustmentBehavior="automatic"
-        allowsFullscreenVideo
-        allowUniversalAccessFromFileURLs
-      />
+      <Fragment>
+        {webLoaded || <WebHolder />}
+        <WebView
+          ref={r => (this.webref = r)}
+          style={{display: webLoaded ? 'flex' : 'none'}}
+          originWhitelist={['*']}
+          onMessage={this.onMessage}
+          source={{uri: url}}
+          onLoad={this.onWebLoad}
+          // allowingReadAccessToURL={`file://${commonDir}`}
+          allowFileAccess
+          contentInsetAdjustmentBehavior="automatic"
+          allowsFullscreenVideo
+          allowUniversalAccessFromFileURLs
+        />
+      </Fragment>
     );
   }
 }
